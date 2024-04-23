@@ -1066,6 +1066,7 @@ type
     procedure FinderShowResultSimple(AFound: boolean; AFinder: TATEditorFinder);
     procedure FinderShowMatchesCount(AMatchCount, ATime: integer);
     function FinderHandleKeyDown(AKey: word; AShiftState: TShiftState): boolean;
+    procedure FinderRequestChangeProcmsg(ADisableProcessMessages: boolean);
     procedure DoMoveTabToGroup(AGroupIndex: Integer; AFromCommandPalette: boolean=false);
     function DoFileOpen(AFileName, AFileName2: string; APages: TATPages=nil; const AOptions: string=''): TEditorFrame;
     procedure DoFileOpenDialog(const AOptions: string='');

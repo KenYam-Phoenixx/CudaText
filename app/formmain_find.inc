@@ -485,6 +485,7 @@ begin
     fmFind.OnGetToken:= @FinderOnGetToken;
     fmFind.OnShowMatchesCount:= @FinderShowMatchesCount;
     fmFind.OnHandleKeyDown:= @FinderHandleKeyDown;
+    fmFInd.OnRequestChangeProcmsg:= @FinderRequestChangeProcmsg;
     fmFind.Color:= GetAppColor(TAppThemeColor.TabBg);
     fmFind.UpdateInitialCaretPos;
 
@@ -965,7 +966,8 @@ begin
     MsgStatus(msgStatusFoundNextMatch+Details, true);
 
     AFinder.Editor.EndUpdate;
-    Application.ProcessMessages;
+    if not AFinder.OptDisableOnProgress then
+      Application.ProcessMessages;
 
     //not DoGotoPos, we may need to show marker, not caret
     AFinder.Editor.DoShowPos(
@@ -1618,5 +1620,10 @@ begin
     (F=FFormFloatGroups2) or
     (F=FFormFloatGroups3) then
     fmFind.Parent:= F;
+end;
+
+procedure TfmMain.FinderRequestChangeProcmsg(ADisableProcessMessages: boolean);
+begin
+  FFinder.OptDisableOnProgress:= ADisableProcessMessages;
 end;
 

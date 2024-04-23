@@ -104,6 +104,7 @@ type
   TAppFinderGetEditor = procedure(out AEditor: TATSynEdit) of object;
   TAppFinderShowMatchesCount = procedure(AMatchCount, ATime: integer) of object;
   TAppFinderKeyDownEvent = function(AKey: word; AShiftState: TShiftState): boolean of object;
+  TAppFinderRequestChangeProcmsg = procedure(ADisableProcessMessages: boolean) of object;
 
 function AppFinderOperationFromString(const Str: string): TAppFinderOperation;
 
@@ -219,6 +220,7 @@ type
     FNarrow: boolean;
     FInputChanged: boolean;
     FInputColored: boolean;
+    FDisableProcmsg: boolean;
     FOnResult: TAppFinderOperationEvent;
     FOnChangeVisible: TNotifyEvent;
     FOnChangeOptions: TNotifyEvent;
@@ -227,6 +229,7 @@ type
     FOnGetToken: TATFinderGetToken;
     FOnShowMatchesCount: TAppFinderShowMatchesCount;
     FOnHandleKeyDown: TAppFinderKeyDownEvent;
+    FOnRequestChangeProcmsg: TAppFinderRequestChangeProcmsg;
     FLexerRegexThemed: boolean;
     FHiAllEnableFindNext: boolean;
     Adapter: TATAdapterEControl;
@@ -235,6 +238,7 @@ type
     procedure ControlAutosizeOptionsByWidth;
     procedure CopyFieldFindToReplace;
     procedure DoFocusEditor;
+    procedure DoRequestDisableProcmsg(ADisableProcmsg: boolean);
     procedure DoResult(Op: TAppFinderOperation; AUpdateEnabledAll: boolean=true);
     function GetHiAll: boolean;
     function GetImmediate: boolean;
@@ -282,6 +286,7 @@ type
     property OnGetToken: TATFinderGetToken read FOnGetToken write FOnGetToken;
     property OnShowMatchesCount: TAppFinderShowMatchesCount read FOnShowMatchesCount write FOnShowMatchesCount;
     property OnHandleKeyDown: TAppFinderKeyDownEvent read FOnHandleKeyDown write FOnHandleKeyDown;
+    property OnRequestChangeProcmsg: TAppFinderRequestChangeProcmsg read FOnRequestChangeProcmsg write FOnRequestChangeProcmsg;
     property IsReplace: boolean read FReplace write SetReplace;
     property IsMultiLine: boolean read FMultiLine write SetMultiLine;
     property IsNarrow: boolean read FNarrow write SetNarrow;
@@ -791,6 +796,7 @@ procedure TfmFind.edFindChange(Sender: TObject);
 var
   Ed: TATSynEdit;
 begin
+  DoRequestDisableProcmsg(true);
   FInputChanged:= true;
 
   {
@@ -824,6 +830,8 @@ begin
 
   if AdapterActive then
     EditorHighlightBadRegexBrackets(edFind, false);
+
+  DoRequestDisableProcmsg(false);
 end;
 
 procedure TfmFind.edFindCommand(Sender: TObject; ACommand: integer;
@@ -1462,7 +1470,9 @@ begin
     if NewColor=clNone then exit;
     edFind.Colors.TextBG:= NewColor;
     edFind.Update;
-    Application.ProcessMessages;
+
+    if not FDisableProcmsg then
+      Application.ProcessMessages;
 
     if FTimerWrapped=nil then
     begin
@@ -1760,6 +1770,13 @@ procedure TfmFind.DoOnChange;
 begin
   if Assigned(FOnChangeOptions) then
     FOnChangeOptions(nil);
+end;
+
+procedure TfmFind.DoRequestDisableProcmsg(ADisableProcmsg: boolean);
+begin
+  FDisableProcmsg:= ADisableProcmsg;
+  if Assigned(FOnRequestChangeProcmsg) then
+    FOnRequestChangeProcmsg(ADisableProcmsg);
 end;
 
 procedure TfmFind.Localize;
