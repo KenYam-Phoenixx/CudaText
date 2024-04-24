@@ -832,6 +832,7 @@ begin
     EditorHighlightBadRegexBrackets(edFind, false);
 
   DoRequestDisableProcmsg(false);
+  Application.ProcessMessages;
 end;
 
 procedure TfmFind.edFindCommand(Sender: TObject; ACommand: integer;
