@@ -451,10 +451,12 @@ begin
     FFindStop:= false;
     FFindConfirmAll:= mrNone;
     InitButtonCancel;
-    ButtonCancel.Show;
-    UpdateGlobalProgressbar(0, true);
     if AUpdateEnableAll then
+    begin
+      ButtonCancel.Show;
+      UpdateGlobalProgressbar(0, true);
       UpdateEnabledAll(false);
+    end;
     if AEdLock then
     begin
       Ed.BeginUpdate;
@@ -465,9 +467,11 @@ begin
   begin
     if Assigned(ButtonCancel) then
       ButtonCancel.Hide;
-    UpdateGlobalProgressbar(0, false);
     if AUpdateEnableAll then
+    begin
+      UpdateGlobalProgressbar(0, false);
       UpdateEnabledAll(true);
+    end;
     //if AEdLock then //works ok even without this check
     begin
       Ed.Enabled:= true;
